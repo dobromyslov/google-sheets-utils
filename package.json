@@ -7,10 +7,10 @@
     "type": "Github",
     "url": "https://github.com/dobromyslov/google-sheets-utils"
   },
+  "homepage": "\"https://github.com/dobromyslov/google-sheets-utils#readme",
   "bugs": {
     "url": "https://github.com/dobromyslov/google-sheets-utils/issues"
   },
-  "homepage": "\"https://github.com/dobromyslov/google-sheets-utils#readme",
   "author": "Viacheslav Dobromyslov <viacheslav@dobromyslov.ru>",
   "keywords": [
     "google sheets",
@@ -24,7 +24,6 @@
   "types": "dist",
   "sideEffects": false,
   "scripts": {
-    "example": "jasmine-ts",
     "test": "xo && tsc --noEmit && nyc jasmine-ts",
     "release": "npm run build && np --no-2fa",
     "build": "del-cli dist && tsc"
