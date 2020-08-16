@@ -1,24 +1,55 @@
 import {google, sheets_v4} from 'googleapis';
 import Sheets = sheets_v4.Sheets;
+import {GoogleAuth, GoogleAuthOptions, OAuth2Client} from 'google-auth-library';
 
 export class GoogleSheetsUtils {
   /**
-   * Google Sheets API instance.
+   * Singleton instance.
    */
-  protected api?: Sheets;
+  protected static instance?: GoogleSheetsUtils;
 
   /**
-   * Authorizes, creates, caches and returns Google Sheets API instance.
+   * Google Sheets API instance.
    */
-  public async getApi(): Promise<Sheets> {
-    if (!this.api) {
-      const auth = await google.auth.getClient({
-        scopes: ['https://www.googleapis.com/auth/spreadsheets']
-      });
-      this.api = google.sheets({version: 'v4', auth});
+  protected api: Sheets;
+
+  /**
+   * Instantiates Google Sheets API with authentication.
+   * The constructor is protected.
+   * Use GoogleSheetsUtils.create() async static method to authenticate and instantiate new instance.
+   * @param auth authentication object.
+   */
+  protected constructor(auth: GoogleAuth | OAuth2Client | string) {
+    this.api = google.sheets({version: 'v4', auth});
+  }
+
+  /**
+   * Authenticates and creates new instance.
+   * Use GoogleSheetsUtils.getInstance() if you need a singleton instance.
+   * @param googleAuthOptions [OPTIONAL] Authentication options.
+   *                                     Default auth scope is https://www.googleapis.com/auth/spreadsheets
+   */
+  public static async create(googleAuthOptions: GoogleAuthOptions = {
+    scopes: ['https://www.googleapis.com/auth/spreadsheets']
+  }): Promise<GoogleSheetsUtils> {
+    const auth = await google.auth.getClient(googleAuthOptions);
+    return new GoogleSheetsUtils(auth);
+  }
+
+  /**
+   * Creates or gets singleton instance.
+   * Use GoogleSheetsUtils.create() if you need new instance.
+   * @param googleAuthOptions [OPTIONAL] Authentication options.
+   *                                     Default auth scope is https://www.googleapis.com/auth/spreadsheets
+   */
+  public static async getInstance(googleAuthOptions: GoogleAuthOptions = {
+    scopes: ['https://www.googleapis.com/auth/spreadsheets']
+  }): Promise<GoogleSheetsUtils> {
+    if (!GoogleSheetsUtils.instance) {
+      GoogleSheetsUtils.instance = await GoogleSheetsUtils.create(googleAuthOptions);
     }
 
-    return this.api;
+    return GoogleSheetsUtils.instance;
   }
 
   /**
@@ -28,8 +59,7 @@ export class GoogleSheetsUtils {
    * @param range range name to start from. Default = Sheet1!A1.
    */
   public async saveRowsToSheet(fileId: string, rows: unknown[][], range = 'Sheet1!A1'): Promise<void> {
-    const api = await this.getApi();
-    await api.spreadsheets.values.update({
+    await this.api.spreadsheets.values.update({
       spreadsheetId: fileId,
       range,
       valueInputOption: 'USER_ENTERED',
@@ -54,8 +84,7 @@ export class GoogleSheetsUtils {
    * @param fileId Google Sheets file ID.
    */
   public async getFirstSheetId(fileId: string): Promise<number | null> {
-    const api = await this.getApi();
-    const existingSheets = (await api.spreadsheets.get({
+    const existingSheets = (await this.api.spreadsheets.get({
       spreadsheetId: fileId,
       fields: 'sheets.properties'
     }))?.data?.sheets;
@@ -76,8 +105,7 @@ export class GoogleSheetsUtils {
    * @param fileId Google Sheets file ID.
    */
   public async clearFirstSheet(fileId: string): Promise<void> {
-    const api = await this.getApi();
-    await api.spreadsheets.batchUpdate({
+    await this.api.spreadsheets.batchUpdate({
       spreadsheetId: fileId,
       requestBody: {
         requests: [{
