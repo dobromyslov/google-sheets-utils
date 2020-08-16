@@ -9,6 +9,11 @@ export class GoogleSheetsUtils {
   protected static instance?: GoogleSheetsUtils;
 
   /**
+   * Authentication options used on first singleton initialization.
+   */
+  protected static singletonGoogleAuthOptions?: GoogleAuthOptions;
+
+  /**
    * Google Sheets API instance.
    */
   protected api: Sheets;
@@ -16,7 +21,8 @@ export class GoogleSheetsUtils {
   /**
    * Instantiates Google Sheets API with authentication.
    * The constructor is protected.
-   * Use GoogleSheetsUtils.create() async static method to authenticate and instantiate new instance.
+   * Use GoogleSheetsUtils.create() async static method to authenticate and instantiate new instance
+   * or GoogleSheetsUtils.getInstance() if you need a singleton.
    * @param auth authentication object.
    */
   protected constructor(auth: GoogleAuth | OAuth2Client | string) {
@@ -47,6 +53,12 @@ export class GoogleSheetsUtils {
   public static async getInstance(googleAuthOptions?: GoogleAuthOptions): Promise<GoogleSheetsUtils> {
     if (!GoogleSheetsUtils.instance) {
       GoogleSheetsUtils.instance = await GoogleSheetsUtils.create(googleAuthOptions);
+      GoogleSheetsUtils.singletonGoogleAuthOptions = googleAuthOptions;
+    } else if (googleAuthOptions && JSON.stringify(googleAuthOptions) !== JSON.stringify(GoogleSheetsUtils.singletonGoogleAuthOptions)) {
+      throw new Error(
+        'Singleton instance has been already created with authOptions. ' +
+        'Please use GoogleSheetsUtils.create() to create another instance with new different auth options.'
+      );
     }
 
     return GoogleSheetsUtils.instance;
