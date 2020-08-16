@@ -63,7 +63,7 @@ This file could be downloaded from Google Cloud IAM console or Firebase Console.
 ```typescript
 import {GoogleSheetsUtils} from 'google-sheets-utils';
 
-const utils = new GoogleSheetsUtils();
+const utils = await GoogleSheetsUtils.create(); // or getInstance() if you want to use a singleton
 await utils.clearFirstSheet('yourGoogleSheetsFileId');
 await utils.saveRowsToSheet('yourGoogleSheetsFileId', [
   ['A1 cell value', 'B1', 'C1'],
