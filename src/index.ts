@@ -29,9 +29,11 @@ export class GoogleSheetsUtils {
    * @param googleAuthOptions [OPTIONAL] Authentication options.
    *                                     Default auth scope is https://www.googleapis.com/auth/spreadsheets
    */
-  public static async create(googleAuthOptions: GoogleAuthOptions = {
-    scopes: ['https://www.googleapis.com/auth/spreadsheets']
-  }): Promise<GoogleSheetsUtils> {
+  public static async create(googleAuthOptions?: GoogleAuthOptions): Promise<GoogleSheetsUtils> {
+    // Set default auth scope
+    googleAuthOptions = googleAuthOptions ?? {};
+    googleAuthOptions.scopes = googleAuthOptions.scopes ?? ['https://www.googleapis.com/auth/spreadsheets'];
+
     const auth = await google.auth.getClient(googleAuthOptions);
     return new GoogleSheetsUtils(auth);
   }
@@ -42,9 +44,7 @@ export class GoogleSheetsUtils {
    * @param googleAuthOptions [OPTIONAL] Authentication options.
    *                                     Default auth scope is https://www.googleapis.com/auth/spreadsheets
    */
-  public static async getInstance(googleAuthOptions: GoogleAuthOptions = {
-    scopes: ['https://www.googleapis.com/auth/spreadsheets']
-  }): Promise<GoogleSheetsUtils> {
+  public static async getInstance(googleAuthOptions?: GoogleAuthOptions): Promise<GoogleSheetsUtils> {
     if (!GoogleSheetsUtils.instance) {
       GoogleSheetsUtils.instance = await GoogleSheetsUtils.create(googleAuthOptions);
     }
