@@ -21,7 +21,7 @@ export class GoogleSheetsUtils {
   /**
    * Instantiates Google Sheets API with authentication.
    * The constructor is protected.
-   * Use GoogleSheetsUtils.create() async static method to authenticate and instantiate new instance
+   * Use GoogleSheetsUtils.create() async static method to authenticate and create new instance
    * or GoogleSheetsUtils.getInstance() if you need a singleton.
    * @param auth authentication object.
    */
