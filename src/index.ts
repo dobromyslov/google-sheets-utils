@@ -135,4 +135,31 @@ export class GoogleSheetsUtils {
       }
     });
   }
+
+  /**
+   * Updates rows height.
+   * @param fileId spreadsheet file ID.
+   * @param height row height in pixels.
+   * @param startRowIndex starting from row index. Default = 1.
+   */
+  public async setRowsHeight(fileId: string, height: number, startRowIndex = 1): Promise<void> {
+    await this.api.spreadsheets.batchUpdate({
+      spreadsheetId: fileId,
+      requestBody: {
+        requests: [{
+          updateDimensionProperties: {
+            range: {
+              sheetId: await this.getFirstSheetId(fileId),
+              dimension: 'ROWS',
+              startIndex: startRowIndex
+            },
+            properties: {
+              pixelSize: height
+            },
+            fields: 'pixelSize'
+          }
+        }]
+      }
+    });
+  }
 }
