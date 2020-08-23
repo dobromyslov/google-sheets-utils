@@ -115,15 +115,19 @@ export class GoogleSheetsUtils {
   /**
    * Clears data on the first sheet.
    * @param fileId Google Sheets file ID.
+   * @param startRowIndex start from row. Default = 1.
+   * @param startColumnIndex start from column. Default = 1.
    */
-  public async clearFirstSheet(fileId: string): Promise<void> {
+  public async clearFirstSheet(fileId: string, startRowIndex = 1, startColumnIndex = 1): Promise<void> {
     await this.api.spreadsheets.batchUpdate({
       spreadsheetId: fileId,
       requestBody: {
         requests: [{
           updateCells: {
             range: {
-              sheetId: await this.getFirstSheetId(fileId)
+              sheetId: await this.getFirstSheetId(fileId),
+              startRowIndex,
+              startColumnIndex
             },
             fields: '*'
           }
