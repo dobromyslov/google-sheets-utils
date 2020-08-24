@@ -129,7 +129,8 @@ export class GoogleSheetsUtils {
               startRowIndex,
               startColumnIndex
             },
-            fields: '*'
+            // See: https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/cells
+            fields: 'userEnteredValue'
           }
         }]
       }
