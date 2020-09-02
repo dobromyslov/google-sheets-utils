@@ -1,5 +1,4 @@
 import {google, sheets_v4} from 'googleapis';
-import Sheets = sheets_v4.Sheets;
 import {GoogleAuth, GoogleAuthOptions, OAuth2Client} from 'google-auth-library';
 
 export class GoogleSheetsUtils {
@@ -16,7 +15,7 @@ export class GoogleSheetsUtils {
   /**
    * Google Sheets API instance.
    */
-  protected api: Sheets;
+  protected api: sheets_v4.Sheets;
 
   /**
    * Instantiates Google Sheets API with authentication.
@@ -62,6 +61,25 @@ export class GoogleSheetsUtils {
     }
 
     return GoogleSheetsUtils.instance;
+  }
+
+  /**
+   * Returns Google Sheets raw API.
+   */
+  public getApi(): sheets_v4.Sheets {
+    return this.api;
+  }
+
+  /**
+   * Returns values from the specified spreadsheet and range.
+   * @param fileId
+   * @param range [OPTIONAL] range in A1 notation. Default is A1.
+   */
+  public async getRowsFromSheet(fileId: string, range = 'A1'): Promise<unknown[][]> {
+    return (await this.api.spreadsheets.values.get({
+      spreadsheetId: fileId,
+      range
+    })).data.values ?? [];
   }
 
   /**
