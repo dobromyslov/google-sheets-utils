@@ -35,42 +35,21 @@
   },
   "devDependencies": {
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
-    "@types/jasmine": "^3.5.14",
-    "@types/node": "^13.11.0",
-    "@typescript-eslint/eslint-plugin": "^4.0.1",
-    "@typescript-eslint/parser": "^4.0.1",
+    "@types/jasmine": "^3.5.13",
+    "@types/node": "^10.17.28",
     "del-cli": "^3.0.1",
-    "eslint-config-xo": "^0.32.1",
-    "eslint-config-xo-typescript": "^0.32.0",
     "jasmine": "^3.6.1",
     "jasmine-ts": "^0.3.0",
-    "np": "^6.5.0",
+    "np": "^6.4.0",
     "nyc": "^15.1.0",
     "source-map-support": "^0.5.19",
     "ts-node": "^9.0.0",
     "typescript": "^4.0.2",
     "xo": "^0.33.1"
   },
-  "eslintConfig": {
-    "extends": [
-      "xo/esnext",
-      "xo-typescript",
-      "xo-typescript/space"
-    ]
-  },
   "xo": {
-    "extends": [
-      "xo-typescript"
-    ],
-    "extensions": [
-      "ts"
-    ],
-    "ignores": [
-      "spec/"
-    ],
     "space": true,
     "rules": {
-      "@typescript-eslint/indent": "off",
       "import/no-unassigned-import": [
         "error",
         {
