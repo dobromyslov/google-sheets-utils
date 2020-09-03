@@ -18,6 +18,7 @@
     "nodejs",
     "utils"
   ],
+  "type": "module",
   "files": [
     "dist"
   ],
