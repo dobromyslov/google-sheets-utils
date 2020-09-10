@@ -131,6 +131,108 @@ export class GoogleSheetsUtils {
   }
 
   /**
+   * Returns sheet ID by it's title.
+   * @param fileId Google Sheets file ID.
+   * @param title Title of the sheet.
+   */
+  public async getSheetIdByTitle(fileId: string, title: string): Promise<number | null> {
+    const existingSheets = (await this.api.spreadsheets.get({
+      spreadsheetId: fileId,
+      fields: 'sheets.properties'
+    }))?.data?.sheets;
+
+    if (existingSheets && existingSheets.length > 0) {
+      for (const sheet of existingSheets) {
+        if (sheet.properties?.title === title) {
+          return sheet.properties?.sheetId ?? null;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Finds sheet with the given ID and renames it.
+   * @param fileId Google Sheets file ID.
+   * @param sheetId Sheet ID.
+   * @param newTitle New sheet title.
+   */
+  public async renameSheetById(fileId: string, sheetId: number, newTitle: string): Promise<void> {
+    await this.api.spreadsheets.batchUpdate({
+      spreadsheetId: fileId,
+      requestBody: {
+        requests: [{
+          updateSheetProperties: {
+            properties: {
+              sheetId,
+              title: newTitle
+            }
+          }
+        }]
+      }
+    });
+  }
+
+  /**
+   * Finds sheet with the given title and renames it.
+   * @param fileId Google Sheets file ID.
+   * @param currentTitle Current title to find sheet.
+   * @param newTitle New sheet title.
+   */
+  public async renameSheetByTitle(fileId: string, currentTitle: string, newTitle: string): Promise<void> {
+    await this.api.spreadsheets.batchUpdate({
+      spreadsheetId: fileId,
+      requestBody: {
+        requests: [{
+          updateSheetProperties: {
+            properties: {
+              sheetId: await this.getSheetIdByTitle(fileId, currentTitle),
+              title: newTitle
+            }
+          }
+        }]
+      }
+    });
+  }
+
+  /**
+   * Deletes sheet with the given ID.
+   * @param fileId Google Sheets file ID.
+   * @param sheetId Sheet id to delete.
+   */
+  public async deleteSheetById(fileId: string, sheetId: number): Promise<void> {
+    await this.api.spreadsheets.batchUpdate({
+      spreadsheetId: fileId,
+      requestBody: {
+        requests: [{
+          deleteSheet: {
+            sheetId
+          }
+        }]
+      }
+    });
+  }
+
+  /**
+   * Finds sheet by the title and deletes it.
+   * @param fileId Google Sheets file ID.
+   * @param title Title to find the sheet.
+   */
+  public async deleteSheetByTitle(fileId: string, title: string): Promise<void> {
+    await this.api.spreadsheets.batchUpdate({
+      spreadsheetId: fileId,
+      requestBody: {
+        requests: [{
+          deleteSheet: {
+            sheetId: await this.getSheetIdByTitle(fileId, title)
+          }
+        }]
+      }
+    });
+  }
+
+  /**
    * Clears data on the first sheet.
    * @param fileId Google Sheets file ID.
    * @param startRowIndex start from row. Default = 1.
