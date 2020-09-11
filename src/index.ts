@@ -195,6 +195,7 @@ export class GoogleSheetsUtils {
       requestBody: {
         requests: [{
           updateSheetProperties: {
+            fields: 'title',
             properties: {
               sheetId,
               title: newTitle
