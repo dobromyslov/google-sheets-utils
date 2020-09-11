@@ -153,6 +153,37 @@ export class GoogleSheetsUtils {
   }
 
   /**
+   * Copies sheet to the specified file.
+   * @param fileId Source Google Sheets file ID.
+   * @param sheetId Source sheet ID.
+   * @param destinationFileId Destination Google Sheets file ID.
+   */
+  public async copySheet(fileId: string, sheetId: number, destinationFileId: string): Promise<void> {
+    await this.api.spreadsheets.sheets.copyTo({
+      spreadsheetId: fileId,
+      sheetId,
+      requestBody: {
+        destinationSpreadsheetId: destinationFileId
+      }
+    });
+  }
+
+  /**
+   * Copies sheet with the given title to the destination file.
+   * @param fileId Source Google Sheets file ID.
+   * @param sheetTitle Source sheet title.
+   * @param destinationFileId Destination Google Sheets file ID.
+   */
+  public async copySheetByTitle(fileId: string, sheetTitle: string, destinationFileId: string): Promise<void> {
+    const sheetId = await this.getSheetIdByTitle(fileId, sheetTitle);
+    if (sheetId === null) {
+      throw new Error(`Sheet '${sheetTitle}' not found.`);
+    }
+
+    await this.copySheet(fileId, sheetId, destinationFileId);
+  }
+
+  /**
    * Finds sheet with the given ID and renames it.
    * @param fileId Google Sheets file ID.
    * @param sheetId Sheet ID.
@@ -181,19 +212,12 @@ export class GoogleSheetsUtils {
    * @param newTitle New sheet title.
    */
   public async renameSheetByTitle(fileId: string, currentTitle: string, newTitle: string): Promise<void> {
-    await this.api.spreadsheets.batchUpdate({
-      spreadsheetId: fileId,
-      requestBody: {
-        requests: [{
-          updateSheetProperties: {
-            properties: {
-              sheetId: await this.getSheetIdByTitle(fileId, currentTitle),
-              title: newTitle
-            }
-          }
-        }]
-      }
-    });
+    const sheetId = await this.getSheetIdByTitle(fileId, currentTitle);
+    if (sheetId === null) {
+      throw new Error(`Sheet '${currentTitle}' not found.`);
+    }
+
+    await this.renameSheetById(fileId, sheetId, newTitle);
   }
 
   /**
@@ -220,16 +244,12 @@ export class GoogleSheetsUtils {
    * @param title Title to find the sheet.
    */
   public async deleteSheetByTitle(fileId: string, title: string): Promise<void> {
-    await this.api.spreadsheets.batchUpdate({
-      spreadsheetId: fileId,
-      requestBody: {
-        requests: [{
-          deleteSheet: {
-            sheetId: await this.getSheetIdByTitle(fileId, title)
-          }
-        }]
-      }
-    });
+    const sheetId = await this.getSheetIdByTitle(fileId, title);
+    if (sheetId === null) {
+      throw new Error(`Sheet '${title}' not found.`);
+    }
+
+    await this.deleteSheetById(fileId, sheetId);
   }
 
   /**
